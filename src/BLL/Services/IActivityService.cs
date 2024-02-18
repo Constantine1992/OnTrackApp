@@ -2,7 +2,7 @@
 
 namespace BLL.Services
 {
-    public interface ITrackerService
+    public interface IActivityService
     {
         TrackerDTO Get(int id);
         IEnumerable<TrackerDTO> GetAll();

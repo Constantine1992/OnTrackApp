@@ -2,10 +2,10 @@
 
 namespace BLL.Services
 {
-    public class TrackerService : ITrackerService
+    public class ActivityService : IActivityService
     {
         private readonly List<TrackerDTO> _trackerList;
-        public TrackerService()
+        public ActivityService()
         {
             _trackerList = new List<TrackerDTO>
             {
