@@ -19,9 +19,9 @@ namespace TimeTracker
             var app = BuildApp(args);
             AddMiddleware(app);
 
-            using(var score = app.Services.CreateScope())
+            using (var scope = app.Services.CreateScope())
             {
-                var apis = score.ServiceProvider.GetServices<BaseApi>();
+                var apis = scope.ServiceProvider.GetServices<BaseApi>();
                 foreach (var api in apis)
                 {
                     api.Registr(app);
