@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using TimeTracker.Configuration.Mapper;
 using TimeTracker.Models;
 using System.Xml.Serialization;
+using TimeTracker.Api;
+using Microsoft.OpenApi.Writers;
+using TimeTracker.Helpers;
 
 namespace TimeTracker
 {
@@ -16,29 +19,17 @@ namespace TimeTracker
             var app = BuildApp(args);
             AddMiddleware(app);
 
-            app.MapGet("/", (HttpContext context, ITrackerService service) => {
-                return service.GetAll();
-            })
-                .Produces<TrackerDTO>()
-                .WithName("GetTrackers")
-                .WithTags("getters");
+            using(var score = app.Services.CreateScope())
+            {
+                var apis = score.ServiceProvider.GetServices<BaseApi>();
+                foreach (var api in apis)
+                {
+                    api.Registr(app);
+                }
 
-            app.MapGet("/{id}", (int id, ITrackerService service) => {
-                return service.Get(id);
-            });
-
-            app.MapPost("/", (HttpContext context, [FromBody]Tracker tracker, IMapper mapper, ITrackerService service) => {
- 
-                var maps = mapper.Map<TrackerDTO>(tracker);
-      
-                service.Add(mapper.Map<Tracker, TrackerDTO>(tracker));
-            });
-
-            app.MapDelete("/{id}", (int id, ITrackerService service) => {
-                service.Delete(id);
-            });
-
-            app.Run();
+                app.Run();
+            }
+           
         }
 
         private static WebApplication BuildApp(params string[] args)
@@ -56,7 +47,8 @@ namespace TimeTracker
             builder.Services.AddAutoMapper(typeof(CustomerProfile));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddScoped<ITrackerService, TrackerService>();
+            builder.Services.AddLogging();
+            builder.Services.RegistrApi();
         }
 
         private static void AddMiddleware(WebApplication app)
